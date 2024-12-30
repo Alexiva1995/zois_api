@@ -1,6 +1,6 @@
-# NestJS Aluxion Backend Test
+# NestJS zois Backend
 
-Este proyecto es una prueba backend realizada en NestJS para la empresa Aluxion, enviada a Ramon Figuera.
+Este proyecto es un backend realizada en NestJS para la empresa zois, enviada a Ramon Figuera.
 
 ## Requisitos
 
