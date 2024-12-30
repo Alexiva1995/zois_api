@@ -1,29 +1,25 @@
-import { Module } from '@nestjs/common';
-
-import { UsersController } from './users.controller';
-
-import { UsersService } from './users.service';
-import { DocumentUserPersistenceModule } from './infrastructure/persistence/document/document-persistence.module';
-import { RelationalUserPersistenceModule } from './infrastructure/persistence/relational/relational-persistence.module';
-import { DatabaseConfig } from '../database/config/database-config.type';
-import databaseConfig from '../database/config/database.config';
-import { FilesModule } from '../files/files.module';
-
-// <database-block>
-const infrastructurePersistenceModule = (databaseConfig() as DatabaseConfig)
-  .isDocumentDatabase
-  ? DocumentUserPersistenceModule
-  : RelationalUserPersistenceModule;
-// </database-block>
+import { Module } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { MongooseModule } from "@nestjs/mongoose";
+import { AuthService } from "../auth/auth.service";
+import { StudentsModule } from "./../students/students.module";
+import { UserSchema } from "./schemas/user.schema";
+import { UsersController } from "./users.controller";
+import { UsersService } from "./users.service";
+import { ProfessorsModule } from "src/professors/professors.module";
+import { AdminSchema } from "./schemas/admin.schema";
 
 @Module({
   imports: [
-    // import modules, etc.
-    infrastructurePersistenceModule,
-    FilesModule,
+    MongooseModule.forFeature([
+      { name: "User", schema: UserSchema },
+      { name: "Admin", schema: AdminSchema }
+    ]),
+    StudentsModule,
+    ProfessorsModule
   ],
   controllers: [UsersController],
-  providers: [UsersService],
-  exports: [UsersService, infrastructurePersistenceModule],
+  providers: [UsersService, AuthService, JwtService],
+  exports: [UsersService, MongooseModule]
 })
 export class UsersModule {}

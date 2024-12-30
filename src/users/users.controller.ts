@@ -1,139 +1,47 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Query,
-  HttpStatus,
-  HttpCode,
-  SerializeOptions,
-} from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
-import { Roles } from '../roles/roles.decorator';
-import { RoleEnum } from '../roles/roles.enum';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from "../auth/auth.service";
+import { Body, Controller, Post, HttpStatus, HttpException } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger";
+import { UsersService } from "./users.service";
+import { CreateUserDto } from "./dto/create-user.dto";
 
-import {
-  InfinityPaginationResponse,
-  InfinityPaginationResponseDto,
-} from '../utils/dto/infinity-pagination-response.dto';
-import { NullableType } from '../utils/types/nullable.type';
-import { QueryUserDto } from './dto/query-user.dto';
-import { User } from './domain/user';
-import { UsersService } from './users.service';
-import { RolesGuard } from '../roles/roles.guard';
-import { infinityPagination } from '../utils/infinity-pagination';
-
-@ApiBearerAuth()
-@Roles(RoleEnum.admin)
-@UseGuards(AuthGuard('jwt'), RolesGuard)
-@ApiTags('Users')
-@Controller({
-  path: 'users',
-  version: '1',
-})
+@ApiTags("users")
+@Controller("users")
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService
+  ) {}
 
-  @ApiCreatedResponse({
-    type: User,
-  })
-  @SerializeOptions({
-    groups: ['admin'],
-  })
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  create(@Body() createProfileDto: CreateUserDto): Promise<User> {
-    return this.usersService.create(createProfileDto);
-  }
-
-  @ApiOkResponse({
-    type: InfinityPaginationResponse(User),
-  })
-  @SerializeOptions({
-    groups: ['admin'],
-  })
-  @Get()
-  @HttpCode(HttpStatus.OK)
-  async findAll(
-    @Query() query: QueryUserDto,
-  ): Promise<InfinityPaginationResponseDto<User>> {
-    const page = query?.page ?? 1;
-    let limit = query?.limit ?? 10;
-    if (limit > 50) {
-      limit = 50;
+  @Post("login")
+  @ApiOperation({ summary: "Log in a user" })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({ status: HttpStatus.OK, description: "Login successful, token returned." })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Invalid email or password." })
+  async login(@Body() loginUserDto: CreateUserDto) {
+    const { user } = await this.usersService.findOneByEmail(loginUserDto.email);
+    if (!user) {
+      throw new HttpException("User not found", HttpStatus.UNAUTHORIZED);
     }
-
-    return infinityPagination(
-      await this.usersService.findManyWithPagination({
-        filterOptions: query?.filters,
-        sortOptions: query?.sort,
-        paginationOptions: {
-          page,
-          limit,
-        },
-      }),
-      { page, limit },
-    );
+    const isPasswordValid = await user.comparePassword(loginUserDto.password);
+    if (!isPasswordValid) {
+      throw new HttpException("Invalid password", HttpStatus.UNAUTHORIZED);
+    }
+    const token = await this.authService.createToken(user);
+    return { user, token };
   }
 
-  @ApiOkResponse({
-    type: User,
-  })
-  @SerializeOptions({
-    groups: ['admin'],
-  })
-  @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  @ApiParam({
-    name: 'id',
-    type: String,
-    required: true,
-  })
-  findOne(@Param('id') id: User['id']): Promise<NullableType<User>> {
-    return this.usersService.findById(id);
-  }
-
-  @ApiOkResponse({
-    type: User,
-  })
-  @SerializeOptions({
-    groups: ['admin'],
-  })
-  @Patch(':id')
-  @HttpCode(HttpStatus.OK)
-  @ApiParam({
-    name: 'id',
-    type: String,
-    required: true,
-  })
-  update(
-    @Param('id') id: User['id'],
-    @Body() updateProfileDto: UpdateUserDto,
-  ): Promise<User | null> {
-    return this.usersService.update(id, updateProfileDto);
-  }
-
-  @Delete(':id')
-  @ApiParam({
-    name: 'id',
-    type: String,
-    required: true,
-  })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: User['id']): Promise<void> {
-    return this.usersService.remove(id);
-  }
+//   @Post("reset-password")
+//   @ApiOperation({ summary: "Reset a user's password" })
+//   @ApiResponse({ status: HttpStatus.OK, description: "Password reset successfully." })
+//   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Invalid or expired token." })
+//   async resetPassword(@Body() body: { token: string; newPassword: string }) {
+//     try {
+//       await this.usersService.resetPassword(body.token, body.newPassword);
+//       return {
+//         message: "Password reset successfully."
+//       };
+//     } catch (error) {
+//       throw new HttpException("Invalid or expired token.", HttpStatus.UNAUTHORIZED);
+//     }
+//   }
 }
