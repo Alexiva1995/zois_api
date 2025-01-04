@@ -20,15 +20,16 @@ export class ProfessorsController {
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: HttpStatus.CREATED, description: "The user has been successfully created." })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "User already exists." })
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.ADMIN)
   async register(@Body() createUserDto: CreateUserDto) {
+
+
     const user = await this.professorService.findOneByEmail(createUserDto.email);
     if (user) {
       throw new HttpException("User already exists", HttpStatus.BAD_REQUEST);
     }
     const createdUser = (await this.professorService.create(createUserDto)) as User;
-    const token = await this.authService.createToken(createdUser);
-    return { user: createdUser, token };
+    return { user: createdUser };
   }
 
   @Delete(":professorId/unsubscribe/:studentId")

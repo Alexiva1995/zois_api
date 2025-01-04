@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { JwtModule, JwtService } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AuthService } from "../auth/auth.service";
 import { StudentsModule } from "./../students/students.module";
@@ -16,7 +16,8 @@ import { AdminSchema } from "./schemas/admin.schema";
       { name: "Admin", schema: AdminSchema }
     ]),
     StudentsModule,
-    ProfessorsModule
+    ProfessorsModule,
+    JwtModule
   ],
   controllers: [UsersController],
   providers: [UsersService, AuthService, JwtService],

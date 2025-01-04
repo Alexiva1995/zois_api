@@ -1,5 +1,6 @@
 import { Schema } from "mongoose";
 import { UserRole } from "src/auth/roles/roles.enum";
+import * as bcrypt from 'bcrypt';
 
 export const ProfessorSchema = new Schema({
   email: { type: String, required: true, unique: true },
@@ -13,13 +14,25 @@ export const ProfessorSchema = new Schema({
   },
   createdAt: { type: Date, default: Date.now },
   signalsCount: { type: Number, default: 0 },
-  professorId: { type: String, required: true, unique: true },
+  professorId: { type: String, required: false, unique: true },
   enrolledStudents: [{ type: Schema.Types.ObjectId, ref: "Student", default: [] }]
 });
 
-ProfessorSchema.pre("save", function (next) {
+ProfessorSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+  console.log('Candidate Password:', candidatePassword);
+  console.log('Stored Password1:', this.password);
+  return bcrypt.compare(candidatePassword, this.password);
+};
+ProfessorSchema.pre("save", async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
   if (!this.professorId) {
     this.professorId = `PROF-${Date.now()}`;
   }
+  console.log('Hashing password...');
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+
   next();
 });

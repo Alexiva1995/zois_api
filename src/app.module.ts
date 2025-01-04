@@ -1,23 +1,43 @@
 import { Module } from "@nestjs/common";
-import { APP_GUARD } from "@nestjs/core";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
-import * as dotenv from "dotenv";
+import { APP_GUARD } from "@nestjs/core";
 import { AuthModule } from "./auth/auth.module";
 import { RolesGuard } from "./auth/guards/roles.guard";
 import { FilesModule } from "./files/files.module";
 import { ProfessorsModule } from "./professors/professors.module";
-import { ProfessorService } from "./professors/professors.service";
 import { StudentsModule } from "./students/students.module";
-import { StudentsService } from "./students/students.service";
-import { UnsplashController } from "./unsplash/unsplash.controller";
 import { UnsplashModule } from "./unsplash/unsplash.module";
-import { UnsplashService } from "./unsplash/unsplash.service";
 import { UsersModule } from "./users/users.module";
-import { UsersService } from "./users/users.service";
-dotenv.config();
+import { JwtModule } from "@nestjs/jwt";
+
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGODB_URI),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: "./.env"
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        const uri = configService.get<string>("MONGODB_URI");
+        return { uri };
+      },
+      inject: [ConfigService]
+    }),
+    JwtModule.registerAsync({
+      global: true,
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>("JWT_SECRET");
+        const expiresIn = configService.get<string>("JWT_EXPIRES_IN");
+        return {
+          secret,
+          signOptions: { expiresIn }
+        };
+      },
+      inject: [ConfigService],
+    }),
     UsersModule,
     StudentsModule,
     ProfessorsModule,
@@ -26,12 +46,7 @@ dotenv.config();
     FilesModule,
     ProfessorsModule
   ],
-  controllers: [UnsplashController],
   providers: [
-    UnsplashService,
-    UsersService,
-    ProfessorService,
-    StudentsService,
     {
       provide: APP_GUARD,
       useClass: RolesGuard

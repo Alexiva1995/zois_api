@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Student } from "./interfaces/student.interface";
+import { CreateStudentDto } from "./dto/create-student.dto";
 @Injectable()
 export class StudentsService {
   constructor(@InjectModel("Student") private readonly userModel: Model<Student>) {}
@@ -39,4 +40,9 @@ export class StudentsService {
       throw new Error("Student is already following this professor");
     }
   }
+
+    async create(createUserDto: CreateStudentDto): Promise<Student> {
+      const createdUser = new this.userModel(createUserDto);
+      return await createdUser.save();
+    }
 }
