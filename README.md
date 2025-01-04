@@ -1,6 +1,6 @@
-# NestJS Aluxion Backend Test
+# NestJS zois Backend
 
-Este proyecto es una prueba backend realizada en NestJS para la empresa Aluxion, enviada a Ramon Figuera.
+Este proyecto es un backend realizada en NestJS para la empresa zois, enviada a Ramon Figuera.
 
 ## Requisitos
 
@@ -13,7 +13,7 @@ Este proyecto es una prueba backend realizada en NestJS para la empresa Aluxion,
 ### Sin Docker
 
 1. Clona el repositorio:
-git clone https://github.com/tu-usuario/[zois-backend-test.git](https://github.com/refm130995/zois-backend-test)
+git clone https://github.com/Alexiva1995/[zois-backend.git](https://github.com/Alexiva1995/zois_api)
 
 2. Navega hasta el directorio del proyecto:
 cd zois-backend-test
@@ -27,7 +27,7 @@ npm run start
 ### Con Docker
 
 1. Clona el repositorio:
-git clone https://github.com/tu-usuario/[zois-backend-test.git](https://github.com/refm130995/zois-backend-test)
+git clone https://github.com/Alexiva1995/[zois-backend.git](https://github.com/Alexiva1995/zois_api)
 
 2. Navega hasta el directorio del proyecto:
 cd zois-backend-test
