@@ -7,9 +7,9 @@ import { RolesGuard } from "./auth/guards/roles.guard";
 import { FilesModule } from "./files/files.module";
 import { ProfessorsModule } from "./professors/professors.module";
 import { StudentsModule } from "./students/students.module";
-import { UnsplashModule } from "./unsplash/unsplash.module";
 import { UsersModule } from "./users/users.module";
 import { JwtModule } from "@nestjs/jwt";
+import { SignalsModule } from "./students copy/signals.module";
 
 @Module({
   imports: [
@@ -36,15 +36,15 @@ import { JwtModule } from "@nestjs/jwt";
           signOptions: { expiresIn }
         };
       },
-      inject: [ConfigService],
+      inject: [ConfigService]
     }),
     UsersModule,
     StudentsModule,
     ProfessorsModule,
     AuthModule,
-    UnsplashModule,
     FilesModule,
-    ProfessorsModule
+    ProfessorsModule,
+    SignalsModule
   ],
   providers: [
     {

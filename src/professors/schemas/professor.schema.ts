@@ -15,7 +15,9 @@ export const ProfessorSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   signalsCount: { type: Number, default: 0 },
   professorId: { type: String, required: false, unique: true },
-  enrolledStudents: [{ type: Schema.Types.ObjectId, ref: "Student", default: [] }]
+  enrolledStudents: [{ type: Schema.Types.ObjectId, ref: "Student", default: [] }],
+  name: { type: String, required: true },
+  surname: { type: String, required: true }
 });
 
 ProfessorSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {

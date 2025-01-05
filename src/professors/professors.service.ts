@@ -49,4 +49,8 @@ export class ProfessorService {
     professor.enrolledStudents.splice(studentIndex, 1);
     await professor.save();
   }
+
+  async findById(professorId: string): Promise<Professor> {
+    return this.userModel.findOne({ where: { id: professorId } });
+  }
 }

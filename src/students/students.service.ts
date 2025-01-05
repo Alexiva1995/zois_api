@@ -41,8 +41,16 @@ export class StudentsService {
     }
   }
 
-    async create(createUserDto: CreateStudentDto): Promise<Student> {
-      const createdUser = new this.userModel(createUserDto);
-      return await createdUser.save();
-    }
+  async create(createUserDto: CreateStudentDto): Promise<Student> {
+    const createdUser = new this.userModel(createUserDto);
+    return await createdUser.save();
+  }
+
+  async findLatestByProfessor(professorId: string, limit: number): Promise<Student[]> {
+    return this.userModel.find({
+      where: { professorId },
+      order: { createdAt: "DESC" },
+      take: limit
+    });
+  }
 }
