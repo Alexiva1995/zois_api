@@ -24,7 +24,7 @@ export class Signal extends Document {
   @Prop({ required: true })
   takeProfit: number;
 
-  @Prop()
+  @Prop({ required: false })
   instructions: string;
 
   @Prop({ type: Types.ObjectId, ref: "Professor", required: true })

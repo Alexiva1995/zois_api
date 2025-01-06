@@ -14,4 +14,18 @@ export class CreateUserDto {
     required: true,
   })
   readonly password: string;
+
+  @ApiProperty({
+    example: "John",
+    description: "The first name of the user",
+    required: true
+  })
+  readonly name: string;
+
+  @ApiProperty({
+    example: "Doe",
+    description: "The last name of the user",
+    required: true
+  })
+  readonly surname: string;
 }

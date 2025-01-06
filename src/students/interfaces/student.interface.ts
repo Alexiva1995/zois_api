@@ -8,4 +8,7 @@ export interface Student extends Document {
   role: string;
   followedProfessors: string[];
   comparePassword(candidatePassword: string): Promise<boolean>;
+  name: string;
+  surname: string;
+  subscriptionDate?: Date;
 }

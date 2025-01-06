@@ -12,6 +12,7 @@ export interface ISignal extends Document {
   professorId: mongoose.Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
+  status?: string;
 }
 
 export const SignalSchema = new mongoose.Schema<ISignal>(
@@ -52,9 +53,15 @@ export const SignalSchema = new mongoose.Schema<ISignal>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Professor",
       required: true
+    },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active"
     }
   },
   {
     timestamps: true
-  }
+  },
+
 );

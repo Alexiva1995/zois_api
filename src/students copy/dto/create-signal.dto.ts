@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 export class CreateSignalDto {
   name: string;
 
@@ -14,4 +15,6 @@ export class CreateSignalDto {
   takeProfit: number;
 
   instructions?: string;
+
+  professorId: Types.ObjectId;
 }

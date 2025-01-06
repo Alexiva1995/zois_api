@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
 export interface Professor extends Document {
   email: string;
@@ -7,5 +7,8 @@ export interface Professor extends Document {
   passwordResetExpires?: Date;
   role: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
-  enrolledStudents: string[];
+  enrolledStudents: Array<{
+    studentId: Types.ObjectId;
+    subscriptionDate: Date;
+  }>;
 }

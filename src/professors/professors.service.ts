@@ -1,7 +1,7 @@
 
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { CreateUserDto } from "./dto/create-professor.dto";
 import { Professor } from "./interfaces/professor.interface";
 @Injectable()
@@ -21,26 +21,40 @@ export class ProfessorService {
     return professor;
   }
 
-  async enrollStudent(professorId: string, studentId: string): Promise<void> {
-    const professor = await this.userModel.findOne({ professorId });
+  async enrollStudent(professorId: string, studentId: Types.ObjectId): Promise<void> {
+
+    const professor = await this.userModel.findOne({ professorId: professorId });
     if (!professor) {
       throw new Error("Professor not found");
     }
 
-    if (!professor.enrolledStudents.includes(studentId)) {
-      professor.enrolledStudents.push(studentId);
+    const studentIndex = professor.enrolledStudents.findIndex(
+      (enrollment) => enrollment.studentId.toString() === studentId.toString()
+    );
+
+    if (studentIndex === -1) {
+      professor.enrolledStudents.push({
+        studentId: studentId,
+        subscriptionDate: new Date()
+      });
+
       await professor.save();
+    } else {
+      console.log("Student already enrolled");
     }
   }
-
-  async unsubscribeStudent(professorId: string, studentId: string): Promise<void> {
-    const professor = await this.userModel.findOne({ professorId });
+  async unsubscribeStudent(professorId: string, studentId: Types.ObjectId): Promise<void> {
+    const professor = await this.userModel.findOne({
+      where: { professorId: professorId },
+    });
 
     if (!professor) {
       throw new Error('Professor not found');
     }
 
-    const studentIndex = professor.enrolledStudents.indexOf(studentId);
+    const studentIndex = professor.enrolledStudents.findIndex(
+      (enrollment) => enrollment.studentId === studentId
+    );
     if (studentIndex === -1) {
       throw new Error('Student not enrolled with this professor');
     }
@@ -50,7 +64,7 @@ export class ProfessorService {
     await professor.save();
   }
 
-  async findById(professorId: string): Promise<Professor> {
-    return this.userModel.findOne({ where: { id: professorId } });
+  async findById(professorId: Types.ObjectId): Promise<Professor> {
+    return this.userModel.findById(professorId).exec();
   }
 }

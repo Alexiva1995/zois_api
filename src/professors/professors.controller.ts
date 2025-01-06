@@ -9,6 +9,7 @@ import { ProfessorService } from "./professors.service";
 import { StudentsService } from "src/students/students.service";
 import { SignalService } from "src/students copy/signals.service";
 import { Request as Req } from "@nestjs/common";
+import { Types } from "mongoose";
 
 @ApiTags("professors")
 @Controller("professors")
@@ -35,28 +36,20 @@ export class ProfessorsController {
   }
 
   @Delete(":professorId/unsubscribe/:studentId")
-  @Roles(UserRole.ADMIN, UserRole.PROFESSOR)
+  // @Roles(UserRole.ADMIN, UserRole.PROFESSOR)
   async unsubscribeStudent(
     @Param("professorId") professorId: string,
-    @Param("studentId") studentId: string
+    @Param("studentId") studentId: Types.ObjectId
   ): Promise<void> {
     await this.professorService.unsubscribeStudent(professorId, studentId);
   }
 
   @Get("dashboard/:professorId")
-  async getProfessorDashboard(@Param("professorId") professorId: string, @Query() filters: any) {
-    // Valida si `professorId` es un ObjectId válido
-    if (!this.isValidObjectId(professorId)) {
-      return {
-        professor: null,
-        latestStudents: [],
-        latestSignals: []
-      };
-    }
-
+  async getProfessorDashboard(@Param("professorId") professorId: Types.ObjectId, @Query() filters: any) {
+    console.log(professorId);
     try {
       const professor = await this.professorService.findById(professorId);
-      const latestStudents = (await this.studentService.findLatestByProfessor(professorId, 3)) || [];
+      const latestStudents = (await this.studentService.findLatestByProfessor(professor, 3)) || [];
       const latestSignals = (await this.signalService.findByProfessorWithFilters(professorId, filters)) || [];
 
       return {
@@ -71,6 +64,38 @@ export class ProfessorsController {
         latestStudents: [],
         latestSignals: []
       };
+    }
+  }
+
+  @Get("students/:professorId")
+  async getProfessorStudents(@Param("professorId") professorId: Types.ObjectId, @Query() filters: any) {
+    try {
+      const professor = await this.professorService.findById(professorId);
+      const students = (await this.studentService.findLatestByProfessor(professor, filters?.limit || 10)) || [];
+
+      return {
+        students
+      };
+    } catch (error) {
+      console.error("Error in getProfessorStudents:", error);
+      return {
+        professor: null,
+        latestStudents: [],
+        latestSignals: []
+      };
+    }
+  }
+
+  @Post(":professorId/enroll/:studentId")
+  async enrollStudent(
+    @Param("professorId") professorId: string,
+    @Param("studentId") studentId: Types.ObjectId
+  ): Promise<{ message: string }> {
+    try {
+      await this.professorService.enrollStudent(professorId, studentId);
+      return { message: "Student successfully enrolled" };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 

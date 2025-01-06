@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { UserRole } from "src/auth/roles/roles.enum";
 import * as bcrypt from 'bcrypt';
 
@@ -15,7 +15,12 @@ export const ProfessorSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   signalsCount: { type: Number, default: 0 },
   professorId: { type: String, required: false, unique: true },
-  enrolledStudents: [{ type: Schema.Types.ObjectId, ref: "Student", default: [] }],
+  enrolledStudents: [
+    {
+      studentId: { type: Types.ObjectId, ref: 'Student', required: true },
+      subscriptionDate: { type: Date, required: true }
+    }
+  ],
   name: { type: String, required: true },
   surname: { type: String, required: true }
 });

@@ -41,7 +41,6 @@ export class StudentsController {
   @ApiBody({ type: CreateStudentDto })
   @ApiResponse({ status: HttpStatus.CREATED, description: "The user has been successfully created." })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "User already exists." })
-  @Roles(UserRole.ADMIN)
   async register(@Body() createUserDto: CreateUserDto) {
     const user = await this.studentsService.findOneByEmail(createUserDto.email);
     if (user) {

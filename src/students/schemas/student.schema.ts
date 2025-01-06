@@ -12,7 +12,9 @@ export const StudentSchema = new Schema({
     enum: Object.values(UserRole),
     default: UserRole.STUDENT
   },
-  followedProfessors: [{ type: Schema.Types.ObjectId, ref: "Professor", default: [] }]
+  followedProfessors: [{ type: Schema.Types.ObjectId, ref: "Professor", default: [] }],
+  name: { type: String, required: true },
+  surname: { type: String, required: true },
 });
 
 StudentSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {

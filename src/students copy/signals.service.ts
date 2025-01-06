@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Signal } from './interfaces/signal.interface';
 
 @Injectable()
@@ -22,17 +22,8 @@ export class SignalService {
       .exec();
   }
 
-  async findByProfessorWithFilters(professorId: string, filters: any): Promise<any[]> {
-    if (!this.isValidObjectId(professorId)) {
-      return [];
-    }
-
+  async findByProfessorWithFilters(professorId: Types.ObjectId, filters: any): Promise<any[]> {
     const signals = await this.signalModel.find({ professorId, ...filters }).exec();
     return signals || [];
-  }
-
-  private isValidObjectId(id: string): boolean {
-    const ObjectId = require('mongoose').Types.ObjectId;
-    return ObjectId.isValid(id);
   }
 }
