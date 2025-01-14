@@ -26,4 +26,8 @@ export class SignalService {
     const signals = await this.signalModel.find({ professorId, ...filters }).exec();
     return signals || [];
   }
+
+  async findAll(): Promise<Signal[]> {
+    return this.signalModel.find().exec();
+  }
 }

@@ -67,4 +67,8 @@ export class ProfessorService {
   async findById(professorId: Types.ObjectId): Promise<Professor> {
     return this.userModel.findById(professorId).exec();
   }
+
+  async findAll(): Promise<Professor[]> {
+    return this.userModel.find().exec();
+  }
 }
