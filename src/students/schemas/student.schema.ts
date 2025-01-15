@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 import { UserRole } from "src/auth/roles/roles.enum";
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 export const StudentSchema = new Schema({
   email: { type: String, required: true, unique: true },
