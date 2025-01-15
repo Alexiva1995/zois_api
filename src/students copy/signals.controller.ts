@@ -25,4 +25,11 @@ export class SignalsController {
 
     return { signals };
   }
+
+  @Get("all")
+  async getAllSignals() {
+    const signals = await this.signalService.findAll();
+
+    return { signals };
+  }
 }
