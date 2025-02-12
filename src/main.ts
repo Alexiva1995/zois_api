@@ -9,7 +9,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle("File Management API")
     .setDescription(
-      "This API allows for file management with operations for uploading, downloading, and searching for images through Unsplash, designed for Aluxion by Ramón Figuera."
+      "This API allows for file management with operations for uploading, downloading, and searching for images through Unsplash, designed for Zois by Ramón Figuera."
     )
     .setVersion("1.0")
     .addBearerAuth()

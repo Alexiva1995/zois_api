@@ -99,9 +99,9 @@ export class ProfessorsController {
     }
   }
 
-  // Método para validar si un ID es un ObjectId válido
-  private isValidObjectId(id: string): boolean {
-    const ObjectId = require("mongoose").Types.ObjectId;
-    return ObjectId.isValid(id);
+  @Get("all")
+  async getAllProfessors() {
+    const professors = await this.professorService.findAll();
+    return { professors };
   }
 }

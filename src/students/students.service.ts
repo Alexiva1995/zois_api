@@ -48,7 +48,7 @@ export class StudentsService {
   }
 
   async findLatestByProfessor(professor: Professor, limit: number): Promise<Partial<Student[]>> {
-    const studentIds = professor.enrolledStudents.map(enrollment => enrollment.studentId);
+    const studentIds = professor?.enrolledStudents.map(enrollment => enrollment.studentId);
     const students = await this.userModel
       .find({ _id: { $in: studentIds } })
       .sort({ createdAt: -1 })
