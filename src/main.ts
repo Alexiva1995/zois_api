@@ -5,7 +5,16 @@ import * as dotenv from "dotenv";
 dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  // Configuración CORS con opciones específicas
+  app.enableCors({
+    origin: [
+      'http://localhost:8100', // Origen de tu aplicación Ionic en desarrollo (ajústalo si es diferente)
+      'https://zois.valdusoft.com/login', // Origen de tu aplicación Ionic en producción (descomenta y ajusta)
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // Si necesitas manejar cookies o el encabezado de autorización
+    allowedHeaders: 'Content-Type, Authorization',
+  });
   const config = new DocumentBuilder()
     .setTitle("File Management API")
     .setDescription(
